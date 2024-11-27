@@ -10,6 +10,8 @@ cards = np.array([])
 SESSION_SHUFFLED = np.array([])
 CARDS_OUT = np.array([])
 
+HAND_CHOICES = np.array(['stand', 'hit', 'surrender'])
+
 for c in card_type:
     hearts = np.append(hearts, f"h-{c}")
     diamonds = np.append(diamonds, f"d-{c}")
@@ -57,8 +59,20 @@ def get_card_value(card: str) -> list[int]:
     else:
         return [10]
 
-def hit():
-    global SESSION_SHUFFLED
+def play_hand():
+    print('Choose your hand ...')
+    for index,c in np.ndenumerate(HAND_CHOICES):
+        print(f"{index[0]+1}. {c.capitalize()}")
+    while True:
+        try:
+            choice = int(input("Your choice : "))
+            return HAND_CHOICES[choice-1]
+        except ValueError:
+            print('Invalid input, try again')
+    
+
+def hit() -> np.ndarray:
+    global SESSION_SHUFFLED, CARDS_OUT
     result = np.array([])
     result = np.append(result, SESSION_SHUFFLED[-1])
     CARDS_OUT = np.append(CARDS_OUT, SESSION_SHUFFLED[-1])

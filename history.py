@@ -4,7 +4,7 @@ def record(round: int, player: str, hand: str):
     if round not in HISTORY:
         HISTORY[round] = {}
     if player not in HISTORY[round]:
-        HISTORY[round][player] = []
+        HISTORY[round][f"{player}"] = []
     HISTORY[round][player].append(hand.lower())
 
 if __name__ == '__main__':

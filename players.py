@@ -1,16 +1,21 @@
 import numpy as np
+import cards
 
 PLAYERS = np.array([])
 DEALERS = np.array([])
 PLAYER_CARDS = {}
+PLAYER_CARDS_STATE = {}
+DEALER_CARDS = {}
+PLAYER_CARDS_STATE = {}
 
 def set_players(players: int, dealers=1):
-    global PLAYERS, DEALERS
+    global PLAYERS, DEALERS, PLAYER_CARDS, DEALER_CARDS
     for i in range(players):
         PLAYERS = np.append(PLAYERS, f"p-{i+1}")
         PLAYER_CARDS[f"p-{i+1}"] = {}
     for i in range(dealers):
         DEALERS = np.append(DEALERS, f"d-{i+1}")
+        DEALER_CARDS[f"d-{i+1}"] = {}
     
 def get_players() -> tuple[np.ndarray, np.ndarray]:
     global PLAYERS, DEALERS
@@ -23,15 +28,60 @@ def _check_player(player: str) -> bool:
     else :
         return False
 
+def _check_dealer(dealer: str) -> bool:
+    global DEALERS
+    if np.where(DEALERS == dealer)[0].size != 0:
+        return True
+    else :
+        return False
+
 def set_cards(player: str, card: str):
-    global PLAYER_CARDS
+    global PLAYER_CARDS, DEALER_CARDS
     if _check_player(player):
-        latest_index_cards = len(PLAYER_CARDS[player])
-        PLAYER_CARDS[player][latest_index_cards] = f"{card[0]}"
+        latest_player_card_index = len(PLAYER_CARDS[player])
+        PLAYER_CARDS[player][latest_player_card_index] = f"{card[0]}"
+    elif _check_dealer(player):
+        latest_dealer_card_index = len(DEALER_CARDS[player])
+        DEALER_CARDS[player][latest_dealer_card_index] = f"{card[0]}"
+
+def set_cards_state(player: str, card1: str, card2: str):
+    global PLAYER_CARDS_STATE, DEALER_CARDS_STATE
+    if _check_player(player):
+        card1_val = cards.get_card_value(card1)
+        card2_val = cards.get_card_value(card2)
+        if len(card1_val) == 2 or len(card2_val) == 2:
+            PLAYER_CARDS_STATE[player] = 'soft'
+        elif len(card1_val) == 1 or len(card1_val) == 1:
+            if card1 == card2:
+                PLAYER_CARDS_STATE[player] = 'same'
+            else:
+                PLAYER_CARDS_STATE[player] = 'hard'
+    elif _check_dealer(player):
+        card1_val = cards.get_card_value(card1)
+        card2_val = cards.get_card_value(card2)
+        if len(card1_val) == 2 or len(card2_val) == 2:
+            DEALER_CARDS_STATE[player] = 'soft'
+        elif len(card1_val) == 1 or len(card1_val) == 1:
+            if card1 == card2:
+                DEALER_CARDS_STATE[player] = 'same'
+            else:
+                DEALER_CARDS_STATE[player] = 'hard'
+
+def reset():
+    global PLAYERS, DEALERS, PLAYER_CARDS, PLAYER_CARDS_STATE, DEALER_CARDS, DEALER_CARDS_STATE
+    PLAYERS = np.array([])
+    DEALERS = np.array([])
+    PLAYER_CARDS = {}
+    PLAYER_CARDS_STATE = {}
+    DEALER_CARDS = {}
+    PLAYER_CARDS_STATE = {}
 
 
 if __name__ == '__main__':
     set_players(5,1)
-    set_cards("p-1", np.array(['s-2']))
-    set_cards("p-1", np.array(['s-3']))
-    print(PLAYER_CARDS)
+    # set_cards("p-1", np.array(['s-2']))
+    # set_cards("p-1", np.array(['s-3']))
+    # print(PLAYER_CARDS)
+    # set_cards_state('p-1', 'h-ace', 's-4')
+    # set_cards_state('p-2', 'h-3', 's-4')
+    print(PLAYERS)
