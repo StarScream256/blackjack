@@ -21,6 +21,24 @@ def get_players() -> tuple[np.ndarray, np.ndarray]:
     global PLAYERS, DEALERS
     return PLAYERS, DEALERS
 
+def get_player_names(name: str) -> str:
+    if name.startswith('p-'):
+        try:
+            number = int(name[2:])
+            return f"Player {number}"
+        except ValueError:
+            return "Invalid player"
+    else: return "Invalid input prefix"
+
+def get_dealer_names(name: str) -> str:
+    if name.startswith('d-'):
+        try:
+            number = int(name[2:])
+            return f"Dealer {number}"
+        except ValueError:
+            return "Invalid dealer"
+    else: return "Invalid input prefix"
+
 def _check_player(player: str) -> bool:
     global PLAYERS
     if np.where(PLAYERS == player)[0].size != 0:
@@ -82,6 +100,6 @@ if __name__ == '__main__':
     # set_cards("p-1", np.array(['s-2']))
     # set_cards("p-1", np.array(['s-3']))
     # print(PLAYER_CARDS)
-    # set_cards_state('p-1', 'h-ace', 's-4')
-    # set_cards_state('p-2', 'h-3', 's-4')
-    print(PLAYERS)
+    set_cards_state('p-1', 'h-ace', 's-4')
+    set_cards_state('p-2', 'h-3', 's-4')
+    print(PLAYER_CARDS_STATE)

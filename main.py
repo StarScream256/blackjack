@@ -20,7 +20,7 @@ for _ in range(2):
     players.set_cards('d-1', cards.get_shuffled_card(1))
 
 for index, player in np.ndenumerate(PLAYERS):
-    print(f"{player}{' (you)' if player == PLAYER else ''} - ", end='')
+    print(f"{players.get_player_names(player)}{' (you)' if player == PLAYER else ''} - ", end='')
     player_cards = players.PLAYER_CARDS[player]
     for index, _ in enumerate(player_cards):
         first_loop = index == 0
@@ -28,7 +28,7 @@ for index, player in np.ndenumerate(PLAYERS):
         print(f"{'' if first_loop else ' '}{players.PLAYER_CARDS[player][index]} {cards.get_card_value(players.PLAYER_CARDS[player][index])}{'' if last_loop else ','}", end='')
     print()
 for index, dealer in np.ndenumerate(DEALERS):
-    print(f"{dealer} (dealer) - ", end='')
+    print(f"{players.get_dealer_names(dealer)} (dealer) - ", end='')
     dealer_cards = players.DEALER_CARDS[dealer]
     for index, _ in enumerate(dealer_cards):
         first_loop = index == 0
