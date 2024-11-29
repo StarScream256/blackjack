@@ -21,8 +21,37 @@ for p in PLAYERS: print(p)
 PLAYER = input('Choose player to play with : p-')
 PLAYER = f"p-{PLAYER}"
 
+def show_player_cards():
+    for index, player in np.ndenumerate(PLAYERS):
+        if players.PLAYER_CARDS[player] != {}:
+            players.set_cards_state(str(player), players.PLAYER_CARDS[player][0], players.PLAYER_CARDS[player][1])
+            print(f"{players.get_player_names(player)}{' (you)' if player == PLAYER else ''} - ", end='')
+            player_cards = players.PLAYER_CARDS[player]
+            for index, _ in enumerate(player_cards):
+                first_loop = index == 0
+                last_loop = index == len(player_cards) - 1
+                print(f"{'' if first_loop else ' '}{players.PLAYER_CARDS[player][index]} {cards.get_card_value(players.PLAYER_CARDS[player][index])}{'' if last_loop else ','}", end='')
+            print()
+
+def show_dealer_cards(is_begin: bool, total_val: int):
+    for index, dealer in np.ndenumerate(DEALERS):
+        print(f"{players.get_dealer_names(dealer)} (dealer) - ", end='')
+        dealer_cards = players.DEALER_CARDS[dealer]
+        for index, _ in enumerate(dealer_cards):
+            first_loop = index == 0
+            last_loop = index == len(dealer_cards) - 1
+            if is_begin:
+                if last_loop :
+                    print(f"{'' if first_loop else ' '}{players.DEALER_CARDS[dealer][index]} {cards.get_card_value(players.DEALER_CARDS[dealer][index])}{'' if last_loop else ', '}", end='')
+                else:
+                    print('[secret],', end='')
+            else:
+                print(f"{'' if first_loop else ' '}{players.DEALER_CARDS[dealer][index]} {cards.get_card_value(players.DEALER_CARDS[dealer][index])}{'' if last_loop else ', '}", end='')
+        print(f"Dealer total value : {total_val}") if is_begin == False else ''
+        print()
+
+
 players_available = PLAYERS.size
-# Loop each round
 while 1 < players_available:
     print(players_available)
     print(ROUND)
@@ -31,27 +60,11 @@ while 1 < players_available:
             if (ROUND > 1 and history.HISTORY[ROUND-1][player] != ['surrender']) or (ROUND == 1):
                 players.set_cards(f"{player}", cards.get_shuffled_card(1))
         players.set_cards('d-1', cards.get_shuffled_card(1))
+    
+    dealer_card_val = (bot.decide_ace_value(cards.get_card_value(players.DEALER_CARDS[1])[0], True if players.DEALER_CARDS[1].endswith('ace') else False) if players.DEALER_CARDS[0].endswith('ace') else cards.get_card_value(players.DEALER_CARDS[0])[0]) + (bot.decide_ace_value(cards.get_card_value(players.DEALER_CARDS[0])[0], True if players.DEALER_CARDS[0].endswith('ace') else False) if players.DEALER_CARDS[1].endswith('ace') else cards.get_card_value(players.DEALER_CARDS[1])[0])
 
-    for index, player in np.ndenumerate(PLAYERS):
-        players.set_cards_state(str(player), players.PLAYER_CARDS[player][0], players.PLAYER_CARDS[player][1])
-        print(f"{players.get_player_names(player)}{' (you)' if player == PLAYER else ''} - ", end='')
-        player_cards = players.PLAYER_CARDS[player]
-        for index, _ in enumerate(player_cards):
-            first_loop = index == 0
-            last_loop = index == len(player_cards) - 1
-            print(f"{'' if first_loop else ' '}{players.PLAYER_CARDS[player][index]} {cards.get_card_value(players.PLAYER_CARDS[player][index])}{'' if last_loop else ','}", end='')
-        print()
-    for index, dealer in np.ndenumerate(DEALERS):
-        print(f"{players.get_dealer_names(dealer)} (dealer) - ", end='')
-        dealer_cards = players.DEALER_CARDS[dealer]
-        for index, _ in enumerate(dealer_cards):
-            first_loop = index == 0
-            last_loop = index == len(dealer_cards) - 1
-            if last_loop:
-                print(f"{'' if first_loop else ' '}{players.DEALER_CARDS[dealer][index]} {cards.get_card_value(players.DEALER_CARDS[dealer][index])}{'' if last_loop else ', '}", end='')
-            else:
-                print('[secret],', end='')
-        print()
+    show_player_cards()
+    show_dealer_cards(is_begin=True)
 
     util.pause_terminal()
     print()
@@ -64,18 +77,30 @@ while 1 < players_available:
                 players.set_cards(f"{player}", cards.hit())
             elif player_hand == 'surrender':
                 util.end_program('You surrender, game ended')
-            print(f"{players.get_player_names(player)} choose {player_hand.upper()}")
+            print(f"{players.get_player_names(player)} (you) choose {player_hand.upper()}")
         else:
             if (ROUND > 1 and history.HISTORY[ROUND-1][player] != ['surrender']) or (ROUND == 1):
                 print(f"{players.get_player_names(player)} is playing ...")
                 bot_cards = np.array([players.PLAYER_CARDS[player][0], players.PLAYER_CARDS[player][1]])
                 bot_hand = bot.play(MODE, player, bot_cards, players.DEALER_CARDS['d-1'])
+
+                if bot_hand == 'hit':
+                    # add new card to bot card -> append
+                    pass
+                # record winning history
+                
                 history.record(ROUND, player, bot_hand)
                 util.sleep_terminal(1.5)
                 util.delete_prevline()
-                print(f"{players.get_player_names(player)} choose {bot_hand.upper()}")
-    
+                if players.PLAYER_CARDS[player] != {}:
+                    print(f"{players.get_player_names(player)} choose {bot_hand.upper()}")
+            elif ROUND > 1 and history.HISTORY[ROUND-1][player] == ['surrender']:
+                history.record(ROUND, player, 'surrender')
+
+    show_dealer_cards(is_begin=False, total_val=dealer_card_val)
+
     players_available = 0
+    print(history.HISTORY)
     for index, player in np.ndenumerate(PLAYERS):
         if history.HISTORY[ROUND][player] != ['surrender']:
             players_available += 1
