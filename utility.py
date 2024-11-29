@@ -1,5 +1,6 @@
 import os
 import sys
+import time
 
 def clear_terminal():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -13,3 +14,12 @@ def delete_prevline():
 def end_program(text = 'Program finished'):
     print(text)
     sys.exit(0)
+
+def sleep_terminal(t):
+    '''
+    Delay terminal
+
+    Args:
+        t (int): number of seconds to sleep
+    '''
+    time.sleep(t)

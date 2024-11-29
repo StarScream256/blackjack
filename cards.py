@@ -60,12 +60,11 @@ def get_card_value(card: str) -> list[int]:
         return [10]
 
 def play_hand():
-    print('Choose your hand ...')
     for index,c in np.ndenumerate(HAND_CHOICES):
         print(f"{index[0]+1}. {c.capitalize()}")
     while True:
         try:
-            choice = int(input("Your choice : "))
+            choice = int(input("Your hand : "))
             return HAND_CHOICES[choice-1]
         except ValueError:
             print('Invalid input, try again')

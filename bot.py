@@ -52,7 +52,7 @@ def soft_total(pair: int, dcv: int) -> str:
 def probability_select(player: str, player_cards: np.ndarray, dealer_upcard: str) -> str:
     consider = ''
     player_card_value = 0
-    player_card_state = players.PLAYER_CARDS_STATE[player]
+    player_card_state = players.PLAYER_CARDS_STATE[str(player)]
     dealer_upcard_val = cards.get_card_value(dealer_upcard)[0]
     if player_card_state == 'hard':
         for card in np.nditer(player_cards):
@@ -60,12 +60,10 @@ def probability_select(player: str, player_cards: np.ndarray, dealer_upcard: str
             player_card_value += cards.get_card_value(card)[0]
         consider = hard_total(player_card_value, dealer_upcard_val)
     elif player_card_state == 'soft':
-        card_type = np.array(['h', 'c', 's', 'd'])
         ace_index = 0
         for index, card in np.ndenumerate(player_cards):
             if 'ace' in str(card): ace_index = index
-        print(type(ace_index))
-        player_cards = np.delete(player_cards, ace_index[0])
+        player_cards = np.delete(player_cards, ace_index)
         for card in np.nditer(player_cards):
             card = str(card)
             player_card_value += cards.get_card_value(card)[0]

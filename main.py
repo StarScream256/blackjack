@@ -21,6 +21,17 @@ for p in PLAYERS: print(p)
 PLAYER = input('Choose player to play with : p-')
 PLAYER = f"p-{PLAYER}"
 
+players_available = 0
+try:
+    for index, player in np.ndenumerate(PLAYERS):
+        if history.HISTORY[ROUND][player] != 'surrender':
+            players_available += 1
+except KeyError:
+    players_available = PLAYERS.size
+    
+# Loop each round
+while 1 < players_available:
+    break
 
 for _ in range(2):
     for index, player in np.ndenumerate(PLAYERS):
@@ -28,6 +39,7 @@ for _ in range(2):
     players.set_cards('d-1', cards.get_shuffled_card(1))
 
 for index, player in np.ndenumerate(PLAYERS):
+    players.set_cards_state(str(player), players.PLAYER_CARDS[player][0], players.PLAYER_CARDS[player][1])
     print(f"{players.get_player_names(player)}{' (you)' if player == PLAYER else ''} - ", end='')
     player_cards = players.PLAYER_CARDS[player]
     for index, _ in enumerate(player_cards):
@@ -48,17 +60,25 @@ for index, dealer in np.ndenumerate(DEALERS):
     print()
 
 util.pause_terminal()
+print()
 for index, player in np.ndenumerate(PLAYERS):
     if player == PLAYER:
+        print(f"{players.get_player_names(player)} playing. Your turn!")
         player_hand = cards.play_hand()
         history.record(ROUND, player, player_hand)
         if player_hand == 'hit':
             players.set_cards(f"{player}", cards.hit())
         elif player_hand == 'surrender':
             util.end_program('You surrender, game ended')
+        print(f"{players.get_player_names(player)} choose {player_hand.upper()}")
     else:
+        print(f"{players.get_player_names(player)} is playing ...")
         bot_cards = np.array([players.PLAYER_CARDS[player][0], players.PLAYER_CARDS[player][1]])
-        print(bot.play(MODE, player, bot_cards, players.DEALER_CARDS['d-1']))
+        bot_hand = bot.play(MODE, player, bot_cards, players.DEALER_CARDS['d-1'])
+        history.record(ROUND, player, bot_hand)
+        util.sleep_terminal(1.5)
+        util.delete_prevline()
+        print(f"{players.get_player_names(player)} choose {bot_hand.upper()}")
 
-
+print(history.HISTORY)
     
