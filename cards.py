@@ -78,7 +78,11 @@ def hit() -> np.ndarray:
     return result
 
 def evaluate_hand(cards_val: int, dealer_cards_total: int):
-    pass
+    won = np.array([True, 'won'])
+    lose = np.array([False, 'lose'])
+    if 21 >= cards_val > dealer_cards_total: return won
+    else: return lose
+
 
 def play():
     global SESSION_SHUFFLED
