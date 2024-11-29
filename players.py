@@ -6,7 +6,7 @@ DEALERS = np.array([])
 PLAYER_CARDS = {}
 PLAYER_CARDS_STATE = {}
 DEALER_CARDS = {}
-PLAYER_CARDS_STATE = {}
+PLAYER_CARDS_STATE = {'p-1': 'soft'}
 
 def set_players(players: int, dealers=1):
     global PLAYERS, DEALERS, PLAYER_CARDS, DEALER_CARDS

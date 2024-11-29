@@ -53,27 +53,56 @@ def probability_select(player: str, player_cards: np.ndarray, dealer_upcard: str
     consider = ''
     player_card_value = 0
     player_card_state = players.PLAYER_CARDS_STATE[player]
+    dealer_upcard_val = cards.get_card_value(dealer_upcard)[0]
     if player_card_state == 'hard':
         for card in np.nditer(player_cards):
-            player_card_value += cards.get_card_value(card)
-        consider = hard_total(player_card_value, cards.get_card_value(dealer_upcard))
+            card = str(card)
+            player_card_value += cards.get_card_value(card)[0]
+        consider = hard_total(player_card_value, dealer_upcard_val)
     elif player_card_state == 'soft':
         card_type = np.array(['h', 'c', 's', 'd'])
-        ace_index = np.where([card + '-ace' in player_cards for card in card_type])
-        player_cards = np.delete(player_cards, ace_index)
+        ace_index = 0
+        for index, card in np.ndenumerate(player_cards):
+            if 'ace' in str(card): ace_index = index
+        print(type(ace_index))
+        player_cards = np.delete(player_cards, ace_index[0])
         for card in np.nditer(player_cards):
-            player_card_value += cards.get_card_value(card)
-        consider = soft_total(player_card_value, cards.get_card_value(dealer_upcard))
+            card = str(card)
+            player_card_value += cards.get_card_value(card)[0]
+        consider = soft_total(player_card_value, dealer_upcard_val)
     elif player_card_state == 'same':
-        if player_cards[0].endswith('ace') and player_cards[1].endswith('ace'):
+        card1_ace = player_cards[0].endswith('ace')
+        card2_ace = player_cards[1].endswith('ace')
+        if card1_ace and card2_ace:
             for card in np.nditer(player_cards):
                 player_card_value += decide_ace_value(player_card_value, True)
-            consider = hard_total(player_card_value, cards.get_card_value(dealer_upcard))
-        elif player_cards[0].endswith('ace') or player_cards[1].endswith('ace'):
-            pass
+            consider = hard_total(player_card_value, dealer_upcard_val)
+        elif card1_ace or card2_ace:
+            if card1_ace:
+                card2_val = cards.get_card_value(player_cards[1])[0]
+                card1_val = decide_ace_value(card2_val, False)
+                consider = hard_total(card1_val+card2_val, dealer_upcard_val)
+            if card2_ace:
+                card1_val = cards.get_card_value(player_cards[0])[0]
+                card2_val = decide_ace_value(card1_val, False)
+                consider = hard_total(card1_val+card2_val, dealer_upcard_val)
+        else:
+            player_cards_value = cards.get_card_value(player_cards[0])[0] + cards.get_card_value(player_cards[1])[0]
+            consider = hard_total(player_cards_value, dealer_upcard_val)
+    return consider
 
-def play(player: str, cards: np.ndarray):
-    pass
 
+def play(mode: str, player: str, cards: np.ndarray, dealer_upcard: str):
+    bot_hand = ''
+    if mode == 'easy':
+        bot_hand = random_select()
+    elif mode == 'normal':
+        randomize = np.random.randint(0, 1)
+        if randomize == 0: bot_hand = random_select()
+        else: bot_hand = probability_select(player, cards, str(dealer_upcard))
+    elif mode == 'hard':
+        bot_hand = probability_select(player, cards, str(dealer_upcard))
+    return bot_hand
+    
 if __name__ == '__main__':
-   print(soft_total(7,10))
+   print(probability_select('p-1', np.array(['s-5', 'h-ace']), 'h-10'))

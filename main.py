@@ -6,6 +6,13 @@ import history
 import bot
 
 ROUND = 1
+MODE_AVAILABLE = np.array(['easy', 'normal', 'hard'])
+MODE = None
+for index, mode in np.ndenumerate(MODE_AVAILABLE):
+    print(f"{index[0]+1}. {mode.capitalize()}")
+MODE = input("Select mode : ")
+MODE = MODE_AVAILABLE[int(MODE)-1]
+
 NUMBER_OR_PLAYERS = input('How many players (dealer not included) : ')
 players.set_players(int(NUMBER_OR_PLAYERS),1)
 PLAYERS, DEALERS = players.get_players()
@@ -13,6 +20,7 @@ print('Players available : ')
 for p in PLAYERS: print(p)
 PLAYER = input('Choose player to play with : p-')
 PLAYER = f"p-{PLAYER}"
+
 
 for _ in range(2):
     for index, player in np.ndenumerate(PLAYERS):
@@ -49,7 +57,8 @@ for index, player in np.ndenumerate(PLAYERS):
         elif player_hand == 'surrender':
             util.end_program('You surrender, game ended')
     else:
-        pass
+        bot_cards = np.array([players.PLAYER_CARDS[player][0], players.PLAYER_CARDS[player][1]])
+        print(bot.play(MODE, player, bot_cards, players.DEALER_CARDS['d-1']))
 
 
     
