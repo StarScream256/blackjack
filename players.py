@@ -86,12 +86,12 @@ def set_cards_state(player: str, card1: str, card2: str):
                 DEALER_CARDS_STATE[player] = 'hard'
 
 def reset():
-    global PLAYERS, DEALERS, PLAYER_CARDS, PLAYER_CARDS_STATE, DEALER_CARDS, DEALER_CARDS_STATE
-    PLAYERS = np.array([])
-    DEALERS = np.array([])
-    PLAYER_CARDS = {}
+    global PLAYER_CARDS, PLAYER_CARDS_STATE, DEALER_CARDS, DEALER_CARDS_STATE
+    for pc in PLAYER_CARDS:
+        PLAYER_CARDS[pc] = {}
     PLAYER_CARDS_STATE = {}
-    DEALER_CARDS = {}
+    for dc in DEALER_CARDS:
+        DEALER_CARDS[dc] = {}
     PLAYER_CARDS_STATE = {}
 
 

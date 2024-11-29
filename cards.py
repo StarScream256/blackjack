@@ -68,7 +68,6 @@ def play_hand():
             return HAND_CHOICES[choice-1]
         except ValueError:
             print('Invalid input, try again')
-    
 
 def hit() -> np.ndarray:
     global SESSION_SHUFFLED, CARDS_OUT
@@ -78,8 +77,16 @@ def hit() -> np.ndarray:
     SESSION_SHUFFLED = np.delete(SESSION_SHUFFLED, [-1])
     return result
 
+def evaluate_hand(cards_val: int, dealer_cards_total: int):
+    pass
+
 def play():
     global SESSION_SHUFFLED
     SESSION_SHUFFLED = _shuffle(np.array([]))
+    
+def reset():
+    global SESSION_SHUFFLED, CARDS_OUT
+    SESSION_SHUFFLED = np.array([])
+    CARDS_OUT = np.array([])
 
 play()
