@@ -73,25 +73,69 @@ while 1 < players_available:
     for index, player in np.ndenumerate(PLAYERS):
         if player == PLAYER:
             print(f"{players.get_player_names(player)} playing. Your turn!")
+            player_cards_val = 0
+            player_cards = players.PLAYER_CARDS[str(player)]
             player_hand = cards.play_hand()
-            history.record(ROUND, player, player_hand)
-            if player_hand == 'hit':
+            if player_hand.startswith('stand'):
+                if player_hand == 'stand_22_ace':
+                    player_cards_val = 22
+                elif player_hand == 'stand_12_ace':
+                    player_cards_val = 12
+                elif player_hand == 'stand_make_ace_11':
+                    for index, (key, value) in enumerate(player_cards):
+                        if player_cards[key].endswith('ace'):
+                            player_cards_val += 11
+                        else:
+                            player_cards_val += cards.get_card_value(player_cards[key])[0]
+                elif player_hand == 'stand_make_ace_1':
+                    for index, (key, value) in enumerate(player_cards):
+                        if player_cards[key].endswith('ace'):
+                            player_cards_val += 1
+                        else:
+                            player_cards_val += cards.get_card_value(player_cards[key])[0]
+                elif player_hand == 'stand':
+                    for index, (key, value) in enumerate(player_cards):
+                        player_cards_val += cards.get_card_value(player_cards[key])[0]
+                player_hand = 'stand'
+            elif player_hand == 'hit':
                 players.set_cards(str(player), cards.hit())
+                player_cards = players.PLAYER_CARDS[str(player)]
+                for index, (key, value) in enumerate(player_cards):
+                    if player_cards[key].endswith('ace'):
+                        for index, (key, value) in enumerate(player_cards):
+                            if not player_cards[key].endswith('ace'):
+                                player_cards_val += cards.get_card_value(player_cards[key])[0]
+                        player_cards_val += bot.decide_ace_value(player_cards_val, False)
+                    else:
+                        player_cards_val += cards.get_card_value(player_cards[key])[0]
             elif player_hand == 'surrender':
                 util.end_program('You surrender, game ended')
             
+            history.record(ROUND, str(player), player_hand)
+            history.win_record(ROUND, str(player), cards.evaluate_hand(player_cards_val, dealer_card_val))
             print(f"{players.get_player_names(player)} (you) choose {player_hand.upper()}")
-            print(players.PLAYER_CARDS)
         else:
             if (ROUND > 1 and history.HISTORY[ROUND-1][player] != ['surrender']) or (ROUND == 1):
                 print(f"{players.get_player_names(player)} is playing ...")
                 bot_cards = np.array([players.PLAYER_CARDS[player][0], players.PLAYER_CARDS[player][1]])
+                bot_cards_val = 0
                 bot_hand = bot.play(MODE, player, bot_cards, players.DEALER_CARDS['d-1'])
 
                 if bot_hand == 'hit': players.set_cards(str(player), cards.hit())
-                
+                bot_cards = np.array([players.PLAYER_CARDS[player][0], players.PLAYER_CARDS[player][1], players.PLAYER_CARDS[player][2]])
+                for index, card in np.ndenumerate(bot_cards):
+                    if card.endswith('ace'):
+                        for index, card in np.ndenumerate(bot_cards):
+                            if not card.endswith('ace'):
+                                bot_cards_val += cards.get_card_value(card)[0]
+                        bot_cards_val += bot.decide_ace_value(bot_cards_val, False)
+                    else:
+                        bot_cards_val += cards.get_card_value(card)[0]
                 
                 history.record(ROUND, player, bot_hand)
+
+                # next : add history winning record
+
                 util.sleep_terminal(1.5)
                 util.delete_prevline()
                 if players.PLAYER_CARDS[player] != {}:
@@ -99,7 +143,10 @@ while 1 < players_available:
             elif ROUND > 1 and history.HISTORY[ROUND-1][player] == ['surrender']:
                 history.record(ROUND, player, 'surrender')
 
+        print(history.WINNING_HISTORY)
     show_dealer_cards(is_begin=False, total_val=dealer_card_val)
+
+    # next : show whow won
 
     players_available = 0
     print(history.HISTORY)
