@@ -47,7 +47,7 @@ def show_dealer_cards(is_begin: bool, total_val: int):
                     print('[secret],', end='')
             else:
                 print(f"{'' if first_loop else ' '}{players.DEALER_CARDS[dealer][index]} {cards.get_card_value(players.DEALER_CARDS[dealer][index])}{'' if last_loop else ', '}", end='')
-        print(f"Dealer total value : {total_val}") if is_begin == False else ''
+        print(f"\nDealer total value : {total_val}") if is_begin == False else ''
         print()
 
 
@@ -58,13 +58,15 @@ while 1 < players_available:
     for _ in range(2):
         for index, player in np.ndenumerate(PLAYERS):
             if (ROUND > 1 and history.HISTORY[ROUND-1][player] != ['surrender']) or (ROUND == 1):
-                players.set_cards(f"{player}", cards.get_shuffled_card(1))
+                players.set_cards(str(player), cards.get_shuffled_card(1))
         players.set_cards('d-1', cards.get_shuffled_card(1))
     
-    dealer_card_val = (bot.decide_ace_value(cards.get_card_value(players.DEALER_CARDS[1])[0], True if players.DEALER_CARDS[1].endswith('ace') else False) if players.DEALER_CARDS[0].endswith('ace') else cards.get_card_value(players.DEALER_CARDS[0])[0]) + (bot.decide_ace_value(cards.get_card_value(players.DEALER_CARDS[0])[0], True if players.DEALER_CARDS[0].endswith('ace') else False) if players.DEALER_CARDS[1].endswith('ace') else cards.get_card_value(players.DEALER_CARDS[1])[0])
+    dealer_card1_val = (bot.decide_ace_value(cards.get_card_value(players.DEALER_CARDS[DEALERS[0]][1])[0], True if players.DEALER_CARDS[DEALERS[0]][1].endswith('ace') else False) if players.DEALER_CARDS[DEALERS[0]][0].endswith('ace') else cards.get_card_value(players.DEALER_CARDS[DEALERS[0]][0])[0])
+    dealer_card2_val = (bot.decide_ace_value(cards.get_card_value(players.DEALER_CARDS[DEALERS[0]][0])[0], True if players.DEALER_CARDS[DEALERS[0]][0].endswith('ace') else False) if players.DEALER_CARDS[DEALERS[0]][1].endswith('ace') else cards.get_card_value(players.DEALER_CARDS[DEALERS[0]][1])[0])
+    dealer_card_val = dealer_card1_val + dealer_card2_val
 
     show_player_cards()
-    show_dealer_cards(is_begin=True)
+    show_dealer_cards(True, dealer_card_val)
 
     util.pause_terminal()
     print()
@@ -74,20 +76,20 @@ while 1 < players_available:
             player_hand = cards.play_hand()
             history.record(ROUND, player, player_hand)
             if player_hand == 'hit':
-                players.set_cards(f"{player}", cards.hit())
+                players.set_cards(str(player), cards.hit())
             elif player_hand == 'surrender':
                 util.end_program('You surrender, game ended')
+            
             print(f"{players.get_player_names(player)} (you) choose {player_hand.upper()}")
+            print(players.PLAYER_CARDS)
         else:
             if (ROUND > 1 and history.HISTORY[ROUND-1][player] != ['surrender']) or (ROUND == 1):
                 print(f"{players.get_player_names(player)} is playing ...")
                 bot_cards = np.array([players.PLAYER_CARDS[player][0], players.PLAYER_CARDS[player][1]])
                 bot_hand = bot.play(MODE, player, bot_cards, players.DEALER_CARDS['d-1'])
 
-                if bot_hand == 'hit':
-                    # add new card to bot card -> append
-                    pass
-                # record winning history
+                if bot_hand == 'hit': players.set_cards(str(player), cards.hit())
+                
                 
                 history.record(ROUND, player, bot_hand)
                 util.sleep_terminal(1.5)
