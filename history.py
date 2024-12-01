@@ -1,5 +1,6 @@
 HISTORY = {}
 WINNING_HISTORY = {}
+VALUE_HISTORY = {}
 
 
 def record(round: int, player: str, hand: str):
@@ -17,6 +18,14 @@ def win_record(round: int, player: str, is_win: bool):
     if player not in WINNING_HISTORY[round]:
         WINNING_HISTORY[round][f"{player}"] = []
     WINNING_HISTORY[round][player].append(is_win)
+
+def value_record(round: int, player: str, cards_val: int):
+    global VALUE_HISTORY
+    if round not in VALUE_HISTORY:
+        VALUE_HISTORY[round] = {}
+    if player not in VALUE_HISTORY[round]:
+        VALUE_HISTORY[round][f"{player}"] = []
+    VALUE_HISTORY[round][player].append(cards_val)
 
 if __name__ == '__main__':
     record(1, 'p-1', 'stand')

@@ -89,6 +89,7 @@ def play_hand(cards: dict):
     elif (is_have_ace and choice == 3) or (is_have_ace == False and choice == 2): choice = HAND_CHOICES[5]
     elif (is_have_ace and choice == 4) or (is_have_ace == False and choice == 3): choice = HAND_CHOICES[6]
     elif is_have_ace == False and choice == 1: choice = HAND_CHOICES[4]
+    return choice
 
 def hit() -> np.ndarray:
     global SESSION_SHUFFLED, CARDS_OUT
@@ -98,11 +99,9 @@ def hit() -> np.ndarray:
     SESSION_SHUFFLED = np.delete(SESSION_SHUFFLED, [-1])
     return result
 
-def evaluate_hand(player_cards_val: int, dealer_cards_val: int):
-    won = np.array([True, 'won'])
-    lose = np.array([False, 'lose'])
-    if 21 >= player_cards_val > dealer_cards_val: return won
-    else: return lose
+def evaluate_hand(player_cards_val: int, dealer_cards_val: int) -> bool:
+    if (21 >= player_cards_val > dealer_cards_val) or (player_cards_val == dealer_cards_val): return True
+    else: return False
 
 
 def play():

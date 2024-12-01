@@ -42,7 +42,7 @@ def soft_total(pair: int, dcv: int) -> str:
         str: The hand consideration
     '''
     consider = ''
-    stand_condition = (7 <= pair <= 9 and 2 <= dcv <= 8) or (8 <= pair <= 9 and 9 <= dcv <= 11)
+    stand_condition = (7 <= pair <= 9 and 2 <= dcv <= 8) or (8 <= pair <= 9 and 9 <= dcv <= 11) or (pair == 10)
     hit_condition = (2 <= pair <= 6 and 2 <= dcv <= 11) or (pair == 7 and 9 <= dcv <= 11)
     if stand_condition: consider = 'stand'
     elif hit_condition: consider = 'hit'
@@ -64,9 +64,7 @@ def probability_select(player: str, player_cards: np.ndarray, dealer_upcard: str
         for index, card in np.ndenumerate(player_cards):
             if 'ace' in str(card): ace_index = index
         player_cards = np.delete(player_cards, ace_index)
-        for card in np.nditer(player_cards):
-            card = str(card)
-            player_card_value += cards.get_card_value(card)[0]
+        for card in np.nditer(player_cards): player_card_value += cards.get_card_value(str(card))[0]
         consider = soft_total(player_card_value, dealer_upcard_val)
     elif player_card_state == 'same':
         card1_ace = player_cards[0].endswith('ace')
